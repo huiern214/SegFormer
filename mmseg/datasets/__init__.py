@@ -11,10 +11,11 @@ from .stare import STAREDataset
 from .voc import PascalVOCDataset
 from .mapillary import MapillaryDataset
 from .cocostuff import CocoStuff
+from .endovis_17 import EndoVis17Dataset
 
 __all__ = [
     'CustomDataset', 'build_dataloader', 'ConcatDataset', 'RepeatDataset',
     'DATASETS', 'build_dataset', 'PIPELINES', 'CityscapesDataset',
     'PascalVOCDataset', 'ADE20KDataset', 'PascalContextDataset',
-    'ChaseDB1Dataset', 'DRIVEDataset', 'HRFDataset', 'STAREDataset', 'MapillaryDataset', 'CocoStuff'
+    'ChaseDB1Dataset', 'DRIVEDataset', 'HRFDataset', 'STAREDataset', 'MapillaryDataset', 'CocoStuff', 'EndoVis17Dataset'
 ]
