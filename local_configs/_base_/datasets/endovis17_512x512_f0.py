@@ -31,27 +31,6 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
-# data = dict(
-#     samples_per_gpu=4,
-#     workers_per_gpu=4,
-#     train=dict(
-#         type=dataset_type,
-#         data_root=data_root,
-#         img_dir='images/training',
-#         ann_dir='annotations/training',
-#         pipeline=train_pipeline),
-#     val=dict(
-#         type=dataset_type,
-#         data_root=data_root,
-#         img_dir='images/validation',
-#         ann_dir='annotations/validation',
-#         pipeline=test_pipeline),
-#     test=dict(
-#         type=dataset_type,
-#         data_root=data_root,
-#         img_dir='images/validation',
-#         ann_dir='annotations/validation',
-#         pipeline=test_pipeline))
 
 data = dict(
     samples_per_gpu=4,
@@ -77,4 +56,12 @@ data = dict(
         ann_dir="ann_dir/val",
         split="splits/fold0_val.txt",
         pipeline=test_pipeline),
+    # test=dict(
+    #     type=dataset_type,
+    #     data_root="data/mmseg_endovis_2018",
+    #     img_dir="img_dir/val",
+    #     ann_dir="ann_dir/val",
+    #     split="splits/val.txt",
+    #     convert2source=True,
+    #     pipeline=test_pipeline),
 )
