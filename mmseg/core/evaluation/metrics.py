@@ -211,8 +211,22 @@ def eval_metrics(results,
                                                      num_classes, ignore_index,
                                                      label_map,
                                                      reduce_zero_label)
-    all_acc = total_area_intersect.sum() / total_area_label.sum()
-    acc = total_area_intersect / total_area_label
+    # all_acc = total_area_intersect.sum() / total_area_label.sum()
+    # acc = total_area_intersect / total_area_label
+    all_acc = np.divide(
+        total_area_intersect.sum(),
+        total_area_label.sum(),
+        out=np.array(0.0, dtype=float),
+        where=(total_area_label.sum() != 0)
+    )
+
+    acc = np.divide(
+        total_area_intersect,
+        total_area_label,
+        out=np.zeros_like(total_area_intersect, dtype=float),
+        where=(total_area_label != 0)
+    )
+    
     ret_metrics = [all_acc, acc]
     for metric in metrics:
         if metric == 'mIoU':

@@ -1,8 +1,62 @@
 import random
 import warnings
-
 import numpy as np
+
+# 🩹 Fix for deprecated np.float / np.int / np.bool in newer NumPy
+if not hasattr(np, 'float'):
+    np.float = float
+if not hasattr(np, 'int'):
+    np.int = int
+if not hasattr(np, 'bool'):
+    np.bool = bool
+
 import torch
+import torch.nn.parallel._functions as torch_parallel_functions
+
+# ⚙️ Patch PyTorch internal function
+if hasattr(torch_parallel_functions, "_get_stream"):
+    _orig_get_stream = torch_parallel_functions._get_stream
+
+    def _patched_get_stream(device):
+        if isinstance(device, int):
+            device = torch.device(f"cuda:{device}")
+        return _orig_get_stream(device)
+
+    torch_parallel_functions._get_stream = _patched_get_stream
+    print("[Patch] Patched torch.nn.parallel._functions._get_stream")
+
+# ⚙️ Patch MMCV's copy as well
+try:
+    import mmcv.parallel._functions as mmcv_parallel_functions
+    if hasattr(mmcv_parallel_functions, "_get_stream"):
+        _orig_mmcv_get_stream = mmcv_parallel_functions._get_stream
+
+        def _patched_mmcv_get_stream(device):
+            if isinstance(device, int):
+                device = torch.device(f"cuda:{device}")
+            return _orig_mmcv_get_stream(device)
+
+        mmcv_parallel_functions._get_stream = _patched_mmcv_get_stream
+        print("[Patch] Patched mmcv.parallel._functions._get_stream")
+except ImportError:
+    print("[Patch] mmcv.parallel._functions not found yet; safe to ignore.")
+
+from mmcv.runner import hooks
+
+# 🩹 Patch TextLoggerHook to safely handle missing keys like data_time / time
+if hasattr(hooks, "TextLoggerHook"):
+    _orig_log_info = hooks.TextLoggerHook._log_info
+
+    def _safe_log_info(self, log_dict, runner):
+        # ensure required keys exist
+        log_dict.setdefault("data_time", 0.0)
+        log_dict.setdefault("time", 0.0)
+        return _orig_log_info(self, log_dict, runner)
+
+    hooks.TextLoggerHook._log_info = _safe_log_info
+    print("[Patch] Safe TextLoggerHook._log_info applied.")
+
+
 from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
 from mmcv.runner import build_optimizer, build_runner
 
@@ -64,8 +118,18 @@ def train_segmentor(model,
             broadcast_buffers=False,
             find_unused_parameters=find_unused_parameters)
     else:
+        # device = torch.device('cuda:0')
+        # model = model.to(device)
+
+
+        # model = MMDataParallel(model.cuda(), device_ids=[0])
+        # model = MMDataParallel(model.cuda(torch.device('cuda:0')), device_ids=[torch.device('cuda:0')])
+
         model = MMDataParallel(
-            model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
+            model.cuda(cfg.gpu_ids[0]), device_ids=[0])
+
+        # model = MMDataParallel(
+        #     model.cuda(cfg.gpu_ids[0]), device_ids=cfg.gpu_ids)
 
     # build runner
     optimizer = build_optimizer(model, cfg.optimizer)

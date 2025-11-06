@@ -12,6 +12,14 @@ from mmseg.datasets import build_dataloader, build_dataset
 from mmseg.models import build_segmentor
 from IPython import embed
 
+import numpy as np
+if not hasattr(np, 'float'):
+    np.float = float
+if not hasattr(np, 'int'):
+    np.int = int
+if not hasattr(np, 'bool'):
+    np.bool = bool
+    
 def parse_args():
     parser = argparse.ArgumentParser(
         description='mmseg test (and eval) a model')
