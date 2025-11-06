@@ -30,7 +30,7 @@ def convert_endovis17(
         src_ann_dir = osp.join(src_root, "annotations", f"seq{seq}")
 
         if not osp.exists(src_img_dir):
-            print(f"⚠️ Missing folder: {src_img_dir} - skipping seq{seq}")
+            print(f"Missing folder: {src_img_dir} - skipping seq{seq}")
             continue
 
         files = sorted(os.listdir(src_img_dir))
@@ -57,11 +57,11 @@ def convert_endovis17(
 
     train_txt.close()
     val_txt.close()
-    print(f"✅ Completed fold{fold}! Output: {save_root}")
+    print(f"Completed fold{fold}! Output: {save_root}")
 
 
 if __name__ == "__main__":
     for f in range(4):
         convert_endovis17(fold=f)
 
-    print("\n🎯 All EndoVis 2017 folds converted successfully!")
+    print("\nAll EndoVis 2017 folds converted successfully!")
